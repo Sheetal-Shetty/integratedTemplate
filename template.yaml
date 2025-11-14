@@ -212,13 +212,13 @@ spec:
             git commit -m "Deploy from Backstage Template"
             git push --force origin gh-pages
 
-    - id: fetch
-      name: Fetch GitHub Repo
-      if: ${{ parameters.stack == 'Kubernetes' }}
-      action: fetch:plain
-      input:
-        url: ${{ parameters.Github_URL }}
-        targetPath: ./site  # fetch code into ./site folder
+    # - id: fetch
+    #   name: Fetch GitHub Repo
+    #   if: ${{ parameters.stack == 'Kubernetes' }}
+    #   action: fetch:plain
+    #   input:
+    #     url: ${{ parameters.Github_URL }}
+    #     targetPath: ./site  # fetch code into ./site folder
 
     - id: fetch-kube
       name: Fetch Kubernetes Manifests
@@ -247,19 +247,15 @@ spec:
           - -c
           - |
             set -e
-            echo "🚀 Applying manifests to Minikube cluster..."
+            echo "Applying manifests to Minikube cluster..."
 
             NAMESPACE="${{ parameters.extraFields.Namespace }}"
             DEPLOY="${{ parameters.extraFields.DeploymentFile }}"
             SERVICE="${{ parameters.extraFields.ServiceFile }}"
 
-            echo "Using namespace: $NAMESPACE"
             kubectl apply -f "$DEPLOY" -n "$NAMESPACE"
             kubectl apply -f "$SERVICE" -n "$NAMESPACE"
-
-            echo "✅ Deployed successfully!"
-            echo "🌐 Fetching service URL..."
-            minikube service --url -n "$NAMESPACE" $(kubectl get svc -n "$NAMESPACE" -o jsonpath='{.items[0].metadata.name}') || true
+            
 
   output:
     links:
