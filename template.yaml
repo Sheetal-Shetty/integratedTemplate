@@ -113,7 +113,7 @@ spec:
   steps:
     - id: fetch-template
       name: Fetch template files
-      if: ${{ parameters.stack == 'Docker' }}
+     # if: ${{ parameters.stack == 'Docker' }}
       action: fetch:plain
       input:
         url: ${{ parameters.Github_URL }}
@@ -148,14 +148,14 @@ spec:
         command: docker
         args: ["run", "--name", "Cafe-container", "-it", "-d", "-p", "89:${{ parameters.extraFields.Port }}", "my-image:latest"] 
 
-    - id: fetch
-      name: Fetch GitHub Repo
-      if: ${{ parameters.stack == 'Github pages' }}
-      action: fetch:plain
-      input:
-        url: ${{ parameters.Github_URL }}
-        #targetPath: ./site  # fetch code into ./site folder
-        targetPath: .
+    # - id: fetch
+    #   name: Fetch GitHub Repo
+    #   if: ${{ parameters.stack == 'Github pages' }}
+    #   action: fetch:plain
+    #   input:
+    #     url: ${{ parameters.Github_URL }}
+    #     #targetPath: ./site  # fetch code into ./site folder
+    #     targetPath: .
    
 
     - id: build
@@ -226,13 +226,13 @@ spec:
             git push --force origin gh-pages
 
 
-    - id: fetch-kube
-      name: Fetch Kubernetes Manifests
-      if: ${{ parameters.stack == 'Kubernetes' }}
-      action: fetch:plain
-      input:
-        url: ${{ parameters.Github_URL }}
-        targetPath: ./kube
+    # - id: fetch-kube
+    #   name: Fetch Kubernetes Manifests
+    #   if: ${{ parameters.stack == 'Kubernetes' }}
+    #   action: fetch:plain
+    #   input:
+    #     url: ${{ parameters.Github_URL }}
+    #     targetPath: ./kube
 
    
     - id: start-minikube
@@ -248,7 +248,8 @@ spec:
       if: ${{ parameters.stack == 'Kubernetes' }}
       action: shell:run
       input:
-        cwd: ./kube
+        #cwd: ./kube
+        cwd: .
         command: bash
         args:
           - -c
