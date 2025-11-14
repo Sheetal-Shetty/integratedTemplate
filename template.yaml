@@ -255,7 +255,8 @@ spec:
           - |
             echo "Extracting IPs from hosts file..."
             grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' "${{ parameters.extraFields.HostsPath }}" | tr '\n' ',' | sed 's/,$//' > ip_list.txt
-            echo "::set-output name=ips::$(cat ip_list.txt)"
+            #echo "::set-output name=ips::$(cat ip_list.txt)"
+            echo "ips=$(cat ip_list.txt)" >> $BACKSTAGE_OUTPUT
 
     - id: Run Playbook
       name: Run Playbook
