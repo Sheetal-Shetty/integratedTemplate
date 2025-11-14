@@ -228,6 +228,14 @@ spec:
         url: ${{ parameters.Github_URL }}
         targetPath: ./kube
 
+   
+    - id: start-minikube
+      name: Start Minikube Cluster
+      action: shell:run
+      input:
+        command: minikube
+        args: ["start", "--driver=docker"]
+        
     - id: apply-kube
       name: Deploy to Kubernetes via Minikube
       if: ${{ parameters.stack == 'Kubernetes' }}
