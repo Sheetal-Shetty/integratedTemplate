@@ -255,8 +255,8 @@ spec:
           - |
             echo "Extracting IPs from hosts file..."
             grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' "${{ parameters.extraFields.HostsPath }}" | tr '\n' ',' | sed 's/,$//' > ip_list.txt
-            #echo "::set-output name=ips::$(cat ip_list.txt)"
-            echo "ips=$(cat ip_list.txt)" >> $BACKSTAGE_OUTPUT
+            echo "::set-output name=ip::$(cat ip_list.txt)"
+            #echo "ips=$(cat ip_list.txt)" >> $BACKSTAGE_OUTPUT
 
     - id: Run Playbook
       name: Run Playbook
@@ -281,5 +281,5 @@ spec:
         icon: "website"
 
       - title: "Open Website deployed from Ansible"
-        url: "http://${{ steps.extract-hosts.output.ips }}/"
+        url: "http://${{ steps.extract-hosts.output.ip }}/"
         icon: "website"
