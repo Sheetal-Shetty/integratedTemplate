@@ -280,5 +280,5 @@ spec:
         icon: "website"
 
       - title: "Open Website deployed from Ansible"
-        url: "http://${{ steps.extract-hosts.output.ip }}/"
+        url: "http://${{ steps.extract-hosts.output.ips }}/"
         icon: "website"
