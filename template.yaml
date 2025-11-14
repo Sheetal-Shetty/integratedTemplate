@@ -237,6 +237,7 @@ spec:
    
     - id: start-minikube
       name: Start Minikube Cluster
+      if: ${{ parameters.stack == 'Kubernetes' }}
       action: shell:run
       input:
         command: minikube
