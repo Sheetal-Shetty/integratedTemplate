@@ -75,7 +75,17 @@ spec:
                   const: Baremetal
                 extraFields:
                   type: object
-                  properties: {}
+                  properties:
+                    PlaybookPath:
+                      title: Enter the Path of PlaybookPath
+                      type: string
+                      description: Enter the PlaybookPath
+                      default: "playbook.yml" 
+                    HostsPath:
+                      title: Enter the Path of Hosts file
+                      type: string
+                      description: Enter the Hosts file
+                      default: "hosts" 
   
             - properties:
                 stack:
@@ -144,7 +154,8 @@ spec:
       action: fetch:plain
       input:
         url: ${{ parameters.Github_URL }}
-        targetPath: ./site  # fetch code into ./site folder
+        #targetPath: ./site  # fetch code into ./site folder
+        targetPath: .
    
 
     - id: build
@@ -179,7 +190,8 @@ spec:
             done
     
             echo "✅ All static files copied to ./dist successfully!"
-        cwd: ./site
+        #cwd: ./site
+        cwd: .
         
 
     - id: publish
@@ -192,7 +204,8 @@ spec:
           - -c
           - |
             set -e
-            cd ./site/dist
+            #cd ./site/dist
+            cd ./dist
 
             # Take the user input GitHub URL
             USER_URL="${{ parameters.Github_URL }}"
@@ -212,13 +225,6 @@ spec:
             git commit -m "Deploy from Backstage Template"
             git push --force origin gh-pages
 
-    # - id: fetch
-    #   name: Fetch GitHub Repo
-    #   if: ${{ parameters.stack == 'Kubernetes' }}
-    #   action: fetch:plain
-    #   input:
-    #     url: ${{ parameters.Github_URL }}
-    #     targetPath: ./site  # fetch code into ./site folder
 
     - id: fetch-kube
       name: Fetch Kubernetes Manifests
