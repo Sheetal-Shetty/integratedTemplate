@@ -81,8 +81,24 @@ spec:
                 stack:
                   const: Kubernetes
                 extraFields:
+                  title: Kubernetes Deployment Details
                   type: object
-                  properties: {}
+                  properties:
+                    DeploymentFile:
+                      title: Deployment Manifest Path
+                      type: string
+                      description: Path to your deployment YAML file (relative to repo)
+                      default: "deployment.yaml"
+                    ServiceFile:
+                      title: Service Manifest Path
+                      type: string
+                      description: Path to your service YAML file (relative to repo)
+                      default: "service.yaml"
+                    Namespace:
+                      title: Kubernetes Namespace (optional)
+                      type: string
+                      description: Namespace to deploy into (leave blank for default)
+                      default: "default"
           
   steps:
     - id: fetch-template
