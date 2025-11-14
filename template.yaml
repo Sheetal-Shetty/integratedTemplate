@@ -113,7 +113,6 @@ spec:
   steps:
     - id: fetch-template
       name: Fetch template files
-     # if: ${{ parameters.stack == 'Docker' }}
       action: fetch:plain
       input:
         url: ${{ parameters.Github_URL }}
@@ -148,16 +147,6 @@ spec:
         command: docker
         args: ["run", "--name", "Cafe-container", "-it", "-d", "-p", "89:${{ parameters.extraFields.Port }}", "my-image:latest"] 
 
-    # - id: fetch
-    #   name: Fetch GitHub Repo
-    #   if: ${{ parameters.stack == 'Github pages' }}
-    #   action: fetch:plain
-    #   input:
-    #     url: ${{ parameters.Github_URL }}
-    #     #targetPath: ./site  # fetch code into ./site folder
-    #     targetPath: .
-   
-
     - id: build
       name: Prepare Static Site
       if: ${{ parameters.stack == 'Github pages' }}
@@ -168,29 +157,28 @@ spec:
           - -c
           - |
             set -e
-            echo "🌐 Static site detected"
-            echo "📍 Working directory: $(pwd)"
-            echo "📂 Files present (excluding hidden):"
+            echo " Static site detected"
+            echo " Working directory: $(pwd)"
+            echo " Files present (excluding hidden):"
             find . -maxdepth 2 -not -path '*/.*'
     
-            echo "📦 Creating ./dist folder"
+            echo " Creating ./dist folder"
             mkdir -p ./dist
     
             # Copy visible files from root if any
             if [ "$(ls -A | grep -v '^\.' | wc -l)" -gt 0 ]; then
-              echo "📋 Copying files from root to ./dist..."
+              echo " Copying files from root to ./dist..."
               rsync -av --exclude='.*' ./ ./dist/
             fi
     
             # Copy all non-hidden subfolders into dist
             SUBFOLDERS=$(find . -mindepth 1 -maxdepth 1 -type d -not -name '.*')
             for F in $SUBFOLDERS; do
-              echo "📂 Copying contents of $F to ./dist..."
+              echo " Copying contents of $F to ./dist..."
               rsync -av --exclude='.*' "$F"/ ./dist/
             done
     
-            echo "✅ All static files copied to ./dist successfully!"
-        #cwd: ./site
+            echo " All static files copied to ./dist successfully!"
         cwd: .
         
 
@@ -224,16 +212,6 @@ spec:
             git add .
             git commit -m "Deploy from Backstage Template"
             git push --force origin gh-pages
-
-
-    # - id: fetch-kube
-    #   name: Fetch Kubernetes Manifests
-    #   if: ${{ parameters.stack == 'Kubernetes' }}
-    #   action: fetch:plain
-    #   input:
-    #     url: ${{ parameters.Github_URL }}
-    #     targetPath: ./kube
-
    
     - id: start-minikube
       name: Start Minikube Cluster
@@ -248,7 +226,6 @@ spec:
       if: ${{ parameters.stack == 'Kubernetes' }}
       action: shell:run
       input:
-        #cwd: ./kube
         cwd: .
         command: bash
         args:
@@ -263,7 +240,30 @@ spec:
 
             kubectl apply -f "$DEPLOY" -n "$NAMESPACE"
             kubectl apply -f "$SERVICE" -n "$NAMESPACE"
-            
+   
+    #---------------------------------------------
+    #            Baremetal
+    #---------------------------------------------
+    - id: extract-hosts
+      name: Extract IPs from hosts file
+      if: ${{ parameters.stack == 'Baremetal' }}
+      action: shell:run
+      input:
+        command: bash
+        args:
+          - -c
+          - |
+            echo "Extracting IPs from hosts file..."
+            grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' "${{ parameters.extraFields.HostsPath }}" | tr '\n' ',' | sed 's/,$//' > ip_list.txt
+            echo "::set-output name=ips::$(cat ip_list.txt)"
+
+    - id: Run Playbook
+      name: Run Playbook
+      if: ${{ parameters.stack == 'Baremetal' }}
+      action: shell:run
+      input:
+        command: ansible-playbook
+        args: ["${{ parameters.extraFields.PlaybookPath }}", "-i", "${{ parameters.extraFields.HostsPath }}"]        
 
   output:
     links:
@@ -274,7 +274,11 @@ spec:
         #url: ${{ steps.github-pages.output.pageUrl }}
         icon: "website"
 
-      - title: "Open Website"
+      - title: "Open Website deployed from Docker"
         if: ${{ parameters.stack == 'Docker' }}
         url: "http://localhost:89"
+        icon: "website"
+
+      - title: "Open Website deployed from Ansible"
+        url: "http://${{ steps.extract-hosts.output.ip }}/"
         icon: "website"
