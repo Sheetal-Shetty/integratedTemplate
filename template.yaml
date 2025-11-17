@@ -1,7 +1,7 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: Github-pages-deploy-from-github
+  name: Backstage driven IDP
   title: Backstage Driven Internal Developer Platform
   description: Automates website deployment using Docker containers or GitHub Pages hosting.
 spec:
