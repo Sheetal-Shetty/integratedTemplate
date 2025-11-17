@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: Backstage-Driven-IDP
-  title: Backstage Driven Internal Developer Platform
+  title: Backstage Driven Internal Developer Platform - Static
   description: Automates website deployment using Docker containers, GitHub Pages hosting, Ansible and Kubernetes.
 spec:
   owner: user:guest
