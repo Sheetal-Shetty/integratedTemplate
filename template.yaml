@@ -284,5 +284,6 @@ spec:
         icon: "website"
 
       - title: "Open Website deployed from Ansible"
-        url: "http://${{ steps.extract-hosts.output.stdout }}/"
+        if: ${{ parameters.stack == 'Baremetal' }}
+        url: "http://172.18.181.50/"
         icon: "website"
